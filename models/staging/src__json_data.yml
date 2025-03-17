@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: liverpool
+    database: club
+    schema: liverpool
+    tables:
+      - name: sportradar_data
+        identifier: sportradar_data
+        columns:
+          - name: data
+            description: "Raw JSON data from the API"
