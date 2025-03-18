@@ -7,6 +7,14 @@ sources:
     tables:
       - name: sportradar_data
         identifier: sportradar_data
+      - name: sport_event_summary
+        identifier: sport_event_summary
+        description: "Match summary data from Sportradar API"
         columns:
-          - name: data
-            description: "Raw JSON data from the API"
+          - name: sport_event_id
+            tests:
+              - not_null
+              - unique
+          - name: match_date
+            tests:
+              - not_null
