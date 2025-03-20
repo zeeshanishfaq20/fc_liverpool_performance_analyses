@@ -12,9 +12,10 @@ with raw_data as (
         coalesce(event.value:sport_event_status.winner_id::string, 'unknown') as winner_id,
         coalesce(event.value:sport_event_status.aggregate_home_score::int, 0) as aggregate_home_score,
         coalesce(event.value:sport_event_status.aggregate_away_score::int, 0) as aggregate_away_score,
-        coalesce(event.value:sport_event_status.aggregate_winner_id::string, 'unknown') as aggregate_winner_id
+        coalesce(event.value:sport_event_status.aggregate_winner_id::string, 'unknown') as aggregate_winner_id,
+        coalesce(event.value:sport_event_status.match_tie::boolean, false) as match_tie
     from {{ source('liverpool', 'sportradar_data') }},
-    lateral flatten(input => data:summaries) event
+    lateral flatten(input => data:summaries) event    
 )
 
 select 
@@ -30,5 +31,6 @@ select
     winner_id,
     aggregate_home_score,
     aggregate_away_score,
-    aggregate_winner_id
+    aggregate_winner_id,
+    match_tie
 from raw_data
