@@ -208,8 +208,8 @@ select
     status,
     match_status,
     case
-    when qualifier = 'home' then home_score
-    else away_score
+        when qualifier = 'home' then home_score
+        else away_score
     end as goals,
     winner_id,
     match_tie,
