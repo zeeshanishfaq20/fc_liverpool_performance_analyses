@@ -24,5 +24,4 @@ player_performance as (
 )
 select
     player_name,
-    matches_played, 
-     m.j/km/.,m
+    matches_played,
