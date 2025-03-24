@@ -16,7 +16,7 @@ else:
 conn = snowflake.connector.connect(
     user="zeeshanishfaq",
     password="Nauman@1879A#24",
-    account="jxnoqfx-pf66186",
+    account="oelqagw-fm13400",
     warehouse="COMPUTE_WH",
     database="CLUB",
     schema="LIVERPOOL")
