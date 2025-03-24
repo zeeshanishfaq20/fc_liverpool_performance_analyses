@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: stg__sport_event
+    description: Staged sport event data of soccer from sportradar API.
+    columns: 
+      - name: event_id
+        description: The primary key for sport event.
+        tests:
+          - unique
+          - not_null
+  - name: stg__competitor
+    description: Staged competitors data of leagues from sportradar API.
+    columns: 
+      - name: competitor_id
+        description: "{{ doc('competitor_id') }}"
+        tests:
+          - not_null
+      - name: event_id
+        description: "{{ doc('competitor_id') }}"
+        tests:
+          - relationships:
+              to: ref('stg__sport_event')
+              field: event_id
+  - name: stg__sport_event_conditions
+    description: Staged sport_event conditions data from sportradar API. 
+    columns:
+      - name: referee_id
+        description: unique and not_null test of referee_id
+        tests:
+          - not_null
+      - name: event_id
+        description: "{{ doc('referee_id') }}"
+        tests:
+          - relationships:
+              to: ref('stg__sport_event')
+              field: event_id
+  - name: stg__venue
+    description: Staged venue of each sport event from sportradar API.
+    columns:
+      - name: venue_id
+        description: unique and not_null test of venue_id
+        tests:
+          - not_null
+      - name: event_id
+        description: "{{ doc('venue_id') }}"
+        tests:
+          - relationships:
+              to: ref('stg__sport_event')
+              field: event_id
+  - name: stg__player_stats
+    description: Staged sport_event each player stats from sportradar API.
+    columns:
+      - name: player_id
+        description: unique and not_null test of player_id
+        tests:
+          - not_null
+      - name: event_id
+        description: "{{ doc('player_id') }}"
+        tests:
+          - relationships:
+              to: ref('stg__sport_event')
+              field: event_id
