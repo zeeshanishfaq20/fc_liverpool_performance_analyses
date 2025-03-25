@@ -1,0 +1,12 @@
+exposures:
+  - name: Top_players
+    label: Top_players
+    type: notebook
+    maturity: high
+    url: https://tinyurl.com/player-performance-reporting
+    description: 'Exposure for players data'
+    depends_on:
+      - ref('dim__player_top_performance')
+    owner:
+      name: Zeeshan Ishfaq
+      email: data@liverpool.com
