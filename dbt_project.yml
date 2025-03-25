@@ -34,5 +34,14 @@ models:
     # Config indicated by + and applies to all files under models/example/
     staging:
       +materialized: view
+    intermediate:
+      +materialized: table
     marts:
       +materialized: table
+    core:
+      +materialized: table
+tests: 
+  liverpool_analyses:
+    +severity: warn
+    +store_failures: true
+    +schema: test_failures
