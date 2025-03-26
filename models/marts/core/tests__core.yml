@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: fct__upcoming_matches
+    description: Upcoming matches for the competitor
+    columns:
+      - name: match_date
+        description: Date of the match
+        tests:
+          - dbt_expectations.expect_column_values_to_be_increasing
+  - name: dim__player_top_performance
+    description: Top 3 player performance in the match
+    columns:
+      - name: player_name
+        description: Name of the player who performed well
+        tests:
+          - dbt_expectations.expect_column_values_to_not_be_null
+    columns:
+      - name: player_rank
+        description: Rank of the player based on stats
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 3
