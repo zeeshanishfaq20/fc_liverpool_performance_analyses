@@ -1,3 +1,8 @@
+{{ config(
+    materialized='incremental',
+    unique_key='event_id' 
+) }}
+
 with raw_data as (
     select 
         coalesce(event.value:sport_event.id::string, 'unknown') as event_id,
@@ -13,7 +18,8 @@ with raw_data as (
         coalesce(event.value:sport_event_status.aggregate_home_score::int, 0) as aggregate_home_score,
         coalesce(event.value:sport_event_status.aggregate_away_score::int, 0) as aggregate_away_score,
         coalesce(event.value:sport_event_status.aggregate_winner_id::string, 'unknown') as aggregate_winner_id,
-        coalesce(event.value:sport_event_status.match_tie::boolean, false) as match_tie
+        coalesce(event.value:sport_event_status.match_tie::boolean, false) as match_tie,
+        updated_at::timestamp as updated_at
     from {{ source('liverpool', 'sportradar_data') }},
     lateral flatten(input => data:summaries) event    
 )
@@ -32,5 +38,10 @@ select
     aggregate_home_score,
     aggregate_away_score,
     aggregate_winner_id,
-    match_tie
+    match_tie,
+    updated_at
 from raw_data
+
+{% if is_incremental() %}
+where updated_at > (select max(updated_at) from {{ this }})
+{% endif %}

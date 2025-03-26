@@ -1,3 +1,8 @@
+{{ config(
+    materialized='incremental',
+    unique_key='event_id' 
+) }}
+
 with raw_data as (
     select 
         coalesce(event.value:sport_event.id::string, 'unknown') as event_id,
@@ -26,7 +31,8 @@ with raw_data as (
         coalesce(event.value:sport_event.sport_event_context.round.cup_round_number_of_sport_events::int, 0) as cup_round_number_of_sport_events,
         coalesce(event.value:sport_event.sport_event_context.round.cup_round_id::string, 'unknown') as cup_round_id,
         coalesce(event.value:sport_event.sport_event_context.groups[0].id::string, 'unknown') as group_id,
-        coalesce(event.value:sport_event.sport_event_context.groups[0].name::string, 'unknown') as group_name
+        coalesce(event.value:sport_event.sport_event_context.groups[0].name::string, 'unknown') as group_name,
+        updated_at::timestamp as updated_at
     from {{ source('liverpool', 'sportradar_data') }},
     lateral flatten(input => data:summaries) event
 )
@@ -58,5 +64,10 @@ select
     cup_round_number_of_sport_events,
     cup_round_id,
     group_id,
-    group_name
+    group_name,
+    updated_at
 from raw_data
+
+{% if is_incremental() %}
+where updated_at > (select max(updated_at) from {{ this }})
+{% endif %}

@@ -1,3 +1,8 @@
+{{ config(
+    materialized='incremental',
+    unique_key='competitor_id' 
+) }}
+
 with raw_data as (
     select 
         coalesce(event.value:sport_event.id::string, 'unknown') as event_id,
@@ -38,7 +43,8 @@ with raw_data as (
         coalesce(competitor.value:statistics.throw_ins::int, 0) as throw_ins,
         coalesce(competitor.value:statistics.was_fouled::int, 0) as was_fouled,
         coalesce(competitor.value:statistics.yellow_cards::int, 0) as yellow_cards,
-        coalesce(competitor.value:statistics.yellow_red_cards::int, 0) as yellow_red_cards
+        coalesce(competitor.value:statistics.yellow_red_cards::int, 0) as yellow_red_cards,
+        updated_at::timestamp as updated_at
     from {{ source('liverpool', 'sportradar_data') }},    
     lateral flatten(input => data:summaries) event,
     lateral flatten(input => event.value:statistics.totals.competitors) competitor
@@ -83,5 +89,10 @@ select
     throw_ins,
     was_fouled,
     yellow_cards,
-    yellow_red_cards
+    yellow_red_cards,
+    updated_at
 from raw_data
+
+{% if is_incremental() %}
+where updated_at > (select max(updated_at) from {{ this }})
+{% endif %}

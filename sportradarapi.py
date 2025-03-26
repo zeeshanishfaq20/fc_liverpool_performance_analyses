@@ -1,9 +1,14 @@
 import requests
 import json
 import snowflake.connector
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Fetch data from Sportradar API
-API_URL = "https://api.sportradar.com/soccer-extended/trial/v4/en/competitors/sr%3Acompetitor%3A44/summaries.json?api_key=5qKS39A3oeSHA0HzXhlRXs89ciYKKHkiZEwWKEos"
+API_URL = os.getenv("API_URL")
 
 # Fetch JSON data from the API
 response = requests.get(API_URL)
@@ -14,12 +19,13 @@ else:
 
 # Connect to Snowflake
 conn = snowflake.connector.connect(
-    user="zeeshanishfaq",
-    password="Nauman@1879A#24",
-    account="oelqagw-fm13400",
-    warehouse="COMPUTE_WH",
-    database="CLUB",
-    schema="LIVERPOOL")
+    user=os.getenv("user"),
+    password=os.getenv("password"),
+    account=os.getenv("account"),
+    warehouse=os.getenv("warehouse"),
+    database=os.getenv("database"),
+    schema=os.getenv("schema")
+)
     
 cursor = conn.cursor()
 

@@ -41,6 +41,7 @@ models:
       - name: venue_id
         description: unique and not_null test of venue_id
         tests:
+          - unique
           - not_null
       - name: event_id
         description: "{{ doc('venue_id') }}"

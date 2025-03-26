@@ -1,3 +1,7 @@
+{{ config(
+    materialized='incremental',
+    unique_key='event_id'
+) }}
 with competitors as (
     select 
         competitor_id,
@@ -293,7 +297,8 @@ select
     tackles_total,
     was_fouled,
     yellow_cards,
-    yellow_red_cards
+    yellow_red_cards,
+    updated_at
 
 from {{ ref('stg__sports_event') }}
 left join competitors using (event_id)
@@ -302,3 +307,7 @@ left join sport_event_conditions using (event_id)
 left join sport_event_status using (event_id)
 left join team_stats using (event_id, competitor_id)
 left join player_stats using (event_id, competitor_id)
+
+{% if is_incremental() %}
+where updated_at > (select max(updated_at) from {{ this }})
+{% endif %}

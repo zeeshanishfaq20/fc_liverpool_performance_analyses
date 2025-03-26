@@ -1,3 +1,8 @@
+{{ config(
+    materialized='incremental',
+    unique_key='competitor_id' 
+) }}
+
 with raw_data as (
     select 
         coalesce(competitor.value:id::string, 'unknown') as competitor_id,
@@ -7,7 +12,8 @@ with raw_data as (
         coalesce(competitor.value:country_code::string, 'unknown') as country_code,
         coalesce(competitor.value:abbreviation::string, 'unknown') as abbreviation,
         coalesce(competitor.value:qualifier::string, 'unknown') as qualifier,
-        coalesce(competitor.value:gender::string , 'unknown') as gender
+        coalesce(competitor.value:gender::string , 'unknown') as gender,
+        updated_at::timestamp as updated_at
     from {{ source('liverpool', 'sportradar_data') }},
     lateral flatten(input => data:summaries) event,
     lateral flatten(input => event.value:sport_event.competitors) competitor
@@ -21,5 +27,10 @@ select
     country_code,
     abbreviation,
     qualifier,
-    gender
+    gender,
+    updated_at
 from raw_data
+
+{% if is_incremental() %}
+where updated_at > (select max(updated_at) from {{ this }})
+{% endif %}
